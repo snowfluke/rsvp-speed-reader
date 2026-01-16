@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Clean build artifacts
+        run: rm -f vite.config.d.ts
+
       - name: Build
         run: bun run build
 
