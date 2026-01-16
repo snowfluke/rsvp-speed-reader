@@ -163,16 +163,22 @@ const App: React.FC = () => {
         <div className="bg-zinc-900/80 backdrop-blur-md px-6 py-4 rounded-2xl border border-zinc-800 flex flex-col items-center gap-2 shadow-2xl">
           <div className="flex gap-4 text-zinc-400">
             <div className="flex items-center gap-1">
-              <span className="px-2 py-0.5 bg-zinc-800 rounded text-white text-xs font-bold">
+              <span className="px-2 py-0.5 bg-zinc-800 rounded text-white text-xs font-bold sm:inline hidden">
                 SPACE
               </span>{" "}
-              <span className="text-xs">Play/Pause</span>
+              <span className="text-xs">
+                <span className="sm:hidden">Tap</span>
+                <span className="hidden sm:inline">Space</span> to Play/Pause
+              </span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="px-2 py-0.5 bg-zinc-800 rounded text-white text-xs font-bold">
+              <span className="px-2 py-0.5 bg-zinc-800 rounded text-white text-xs font-bold sm:inline hidden">
                 ESC
               </span>{" "}
-              <span className="text-xs">Exit Zen</span>
+              <span className="text-xs">
+                <span className="sm:hidden">Exit button</span>
+                <span className="hidden sm:inline">ESC</span> to Exit Zen
+              </span>
             </div>
           </div>
           <p className="text-red-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">
@@ -233,14 +239,19 @@ const App: React.FC = () => {
           isZenMode ? "gap-0 py-0" : "gap-8 py-12"
         }`}
       >
-        <RSVPPlayer
-          currentWord={words[currentIndex]}
-          progress={progress}
-          zenMode={isZenMode}
-          font={font}
-          fontWeight={fontWeight}
-          sideOpacity={sideOpacity}
-        />
+        <div 
+          onClick={isZenMode ? togglePlay : undefined}
+          className={`w-full flex justify-center items-center ${isZenMode ? 'cursor-pointer' : ''}`}
+        >
+          <RSVPPlayer
+            currentWord={words[currentIndex]}
+            progress={progress}
+            zenMode={isZenMode}
+            font={font}
+            fontWeight={fontWeight}
+            sideOpacity={sideOpacity}
+          />
+        </div>
 
         {/* Playback Controls - Hidden in Zen Mode */}
         <div
@@ -636,11 +647,10 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Exit Zen Mode Button - Only visible in Zen Mode on mouse move */}
       <div
         className={`fixed top-8 right-8 z-[100] transition-opacity duration-300 group ${
           isZenMode
-            ? "opacity-0 hover:opacity-100"
+            ? "opacity-20 sm:opacity-0 hover:opacity-100"
             : "opacity-0 pointer-events-none"
         }`}
       >
