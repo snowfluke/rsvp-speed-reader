@@ -100,6 +100,14 @@ const App: React.FC = () => {
 
   const progress = words.length > 0 ? ((currentIndex + 1) / words.length) * 100 : 0;
 
+  const currentDisplayWpm = useMemo(() => {
+    if (isPlaying && enableGradualIncrease && words.length > 0) {
+      const progressRatio = currentIndex / (words.length - 1 || 1);
+      return Math.round(initialWpm + (targetWpm - initialWpm) * progressRatio);
+    }
+    return wpm;
+  }, [isPlaying, enableGradualIncrease, currentIndex, words.length, initialWpm, targetWpm, wpm]);
+
   return (
     <div className={`min-h-screen bg-black text-white flex flex-col font-sans transition-all duration-700 ${isZenMode ? 'cursor-none' : ''}`}>
       {/* Zen Hint Overlay */}
@@ -200,16 +208,17 @@ const App: React.FC = () => {
             <div className="w-full max-w-md flex flex-col gap-2">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Reading Speed</span>
-                  <span className="text-xl font-bold mono text-red-500">{wpm} WPM</span>
+                  <span className="text-xl font-bold mono text-red-500">{currentDisplayWpm} WPM</span>
                 </div>
                 <input 
                     type="range" 
                     min="100" 
                     max="1000" 
                     step={wpmJumpStep}
-                    value={wpm} 
+                    value={currentDisplayWpm} 
                     onChange={(e) => setWpm(parseInt(e.target.value))}
-                    className="w-full accent-red-600 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                    disabled={isPlaying && enableGradualIncrease}
+                    className={`w-full accent-red-600 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer ${isPlaying && enableGradualIncrease ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
             </div>
         </div>
