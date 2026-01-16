@@ -1,0 +1,5 @@
+{
+  "name": "RSVP Speed Reader",
+  "description": "A Rapid Serial Visual Presentation (RSVP) application that helps you read text faster by flashing words one by one with a focal point highlight.",
+  "requestFramePermissions": []
+}
