@@ -1,12 +1,21 @@
-
 export interface WordData {
   text: string;
   focalIndex: number;
 }
 
-export interface RSVPState {
+export type AppFont = 'mono' | 'sans' | 'serif';
+export type AppFontWeight = 'normal' | 'bold';
+
+export interface ReaderSettings {
+  wpm: number;
+  font: AppFont;
+  fontWeight: AppFontWeight;
+  sideOpacity: number;
+  audioSrc: string;
+}
+
+export interface RSVPState extends ReaderSettings {
   isPlaying: boolean;
   currentWordIndex: number;
-  wpm: number;
   text: string;
 }

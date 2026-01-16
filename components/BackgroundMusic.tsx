@@ -5,9 +5,10 @@ import { Volume2, VolumeX } from 'lucide-react';
 interface BackgroundMusicProps {
   isPlaying: boolean;
   isZenMode?: boolean;
+  src?: string;
 }
 
-const BackgroundMusic: React.FC<BackgroundMusicProps> = ({ isPlaying, isZenMode }) => {
+const BackgroundMusic: React.FC<BackgroundMusicProps> = ({ isPlaying, isZenMode, src }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -26,7 +27,7 @@ const BackgroundMusic: React.FC<BackgroundMusicProps> = ({ isPlaying, isZenMode 
       <audio
         ref={audioRef}
         loop
-        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" // Placeholder for focus music
+        src={src || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"} 
       />
       <button
         onClick={() => setIsMuted(!isMuted)}

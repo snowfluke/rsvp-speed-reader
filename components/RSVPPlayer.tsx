@@ -1,24 +1,32 @@
-import React from "react";
-import { WordData } from "../types";
+import { WordData, AppFont, AppFontWeight } from "../types";
 import { splitWord } from "../utils/textProcessor";
 
 interface RSVPPlayerProps {
   currentWord: WordData | undefined;
   progress: number;
   zenMode?: boolean;
+  font: AppFont;
+  fontWeight: AppFontWeight;
+  sideOpacity: number;
 }
 
 const RSVPPlayer: React.FC<RSVPPlayerProps> = ({
   currentWord,
   progress,
   zenMode,
+  font,
+  fontWeight,
+  sideOpacity,
 }) => {
+  const fontClass = font === 'mono' ? 'font-mono' : font === 'serif' ? 'font-serif' : 'font-sans';
+  const weightClass = fontWeight === 'bold' ? 'font-bold' : 'font-normal';
+
   if (!currentWord) {
     return (
       <div
         className={`w-full flex items-center justify-center bg-black relative overflow-hidden transition-all duration-700 ${
           zenMode ? "h-screen border-none" : "h-64 border-y border-zinc-800"
-        }`}
+        } ${fontClass}`}
       >
         <span className="text-zinc-600 font-medium">No text to display</span>
       </div>
@@ -31,7 +39,7 @@ const RSVPPlayer: React.FC<RSVPPlayerProps> = ({
     <div
       className={`w-full flex flex-col items-center justify-center bg-black relative overflow-hidden transition-all duration-700 ${
         zenMode ? "h-screen border-none" : "h-64 border-y border-zinc-800"
-      }`}
+      } ${fontClass}`}
     >
       {/* Vertical Guideline Markers - Perfectly centered and higher z-index */}
       <div
@@ -56,23 +64,29 @@ const RSVPPlayer: React.FC<RSVPPlayerProps> = ({
 
       {/* Word Container */}
       <div
-        className={`relative flex items-center mono font-bold tracking-tight transition-all duration-700 w-full z-10 ${
+        className={`relative flex items-center tracking-tight transition-all duration-700 w-full z-10 ${
           zenMode ? "text-6xl md:text-9xl" : "text-4xl md:text-7xl"
-        }`}
+        } ${weightClass}`}
       >
         <div className="flex w-full items-center justify-center relative">
-          {/* Prefix: Takes exactly half of the container width minus half the focal width */}
-          <div className="flex-1 text-right text-white opacity-80 whitespace-nowrap overflow-visible">
+          {/* Prefix */}
+          <div 
+            className="flex-1 text-right text-white whitespace-nowrap overflow-visible"
+            style={{ opacity: sideOpacity }}
+          >
             {prefix}
           </div>
 
-          {/* Focal Character: Fixed width '1ch' (one character width in mono) anchored to the exact center */}
+          {/* Focal Character */}
           <div className="w-[1ch] shrink-0 text-center text-red-600 shadow-red-900/20 drop-shadow-[0_0_20px_rgba(220,38,38,0.6)] z-20">
             {focal}
           </div>
 
-          {/* Suffix: Takes exactly half of the container width minus half the focal width */}
-          <div className="flex-1 text-left text-white opacity-80 whitespace-nowrap overflow-visible">
+          {/* Suffix */}
+          <div 
+            className="flex-1 text-left text-white whitespace-nowrap overflow-visible"
+            style={{ opacity: sideOpacity }}
+          >
             {suffix}
           </div>
         </div>
