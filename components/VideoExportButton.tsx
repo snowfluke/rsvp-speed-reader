@@ -83,7 +83,8 @@ const VideoExportButton: React.FC<VideoExportButtonProps> = ({
             currentWordWpm = initialWpm + (targetWpm - initialWpm) * progressRatio;
         }
 
-        const interval = 60000 / currentWordWpm;
+        const pauseMultiplier = word.pauseMultiplier || 1;
+        const interval = (60000 / currentWordWpm) * pauseMultiplier;
         const framesPerWord = Math.max(1, Math.round((interval / 1000) * 60));
         
         for (let frame = 0; frame < framesPerWord; frame++) {

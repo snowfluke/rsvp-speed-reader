@@ -20,10 +20,20 @@ export const processText = (text: string): WordData[] => {
   // Split by whitespace and filter out empty strings
   const words = text.trim().split(/\s+/);
   
-  return words.map(word => ({
-    text: word,
-    focalIndex: calculateFocalIndex(word)
-  }));
+  return words.map(word => {
+    let pauseMultiplier = 1;
+    if (word.endsWith('.') || word.endsWith('!') || word.endsWith('?')) {
+      pauseMultiplier = 1.5;
+    } else if (word.endsWith(',') || word.endsWith(';') || word.endsWith(':')) {
+      pauseMultiplier = 1.25;
+    }
+
+    return {
+      text: word,
+      focalIndex: calculateFocalIndex(word),
+      pauseMultiplier
+    };
+  });
 };
 
 /**

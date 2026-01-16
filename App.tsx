@@ -79,7 +79,10 @@ const App: React.FC = () => {
         currentWpm = initialWpm + (targetWpm - initialWpm) * progressRatio;
       }
 
-      const interval = 60000 / currentWpm;
+      const word = words[currentIndex];
+      const pauseMultiplier = word?.pauseMultiplier || 1;
+      const interval = (60000 / currentWpm) * pauseMultiplier;
+      
       timerRef.current = setTimeout(() => {
         setCurrentIndex(prev => {
           if (prev + 1 >= words.length) {

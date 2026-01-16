@@ -1,6 +1,7 @@
 export interface WordData {
   text: string;
   focalIndex: number;
+  pauseMultiplier?: number;
 }
 
 export type AppFont = 'mono' | 'sans' | 'serif';
