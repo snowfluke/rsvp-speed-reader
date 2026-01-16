@@ -1,10 +1,10 @@
-# Focus RSVP - Speed Reader
+# RSVP Speed Reader
 
-![speed reader demo](/speed-read.gif)
+![rsvp speed reader demo](/speed-read.gif)
 
 ## Accelerate Your Reading
 
-**Focus RSVP** is a productivity tool that utilizes **Rapid Serial Visual Presentation** to help you consume text at lightning speeds. By flashing words one by one at a fixed focal point, it eliminates the need for eye movements (saccades), allowing your brain to process information significantly faster.
+**RSVP Speed Reader** is a productivity tool that utilizes **Rapid Serial Visual Presentation** to help you consume text at lightning speeds. By flashing words one by one at a fixed focal point, it eliminates the need for eye movements (saccades), allowing your brain to process information significantly faster.
 
 ### How to Use
 
