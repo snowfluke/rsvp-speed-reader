@@ -1,5 +1,4 @@
-
-import { WordData } from '../types';
+import { WordData } from "../types";
 
 /**
  * Calculates the Optimal Focal Point (OFP) index for a word.
@@ -16,22 +15,22 @@ export const calculateFocalIndex = (word: string): number => {
 
 export const processText = (text: string): WordData[] => {
   if (!text) return [];
-  
+
   // Split by whitespace and filter out empty strings
   const words = text.trim().split(/\s+/);
-  
-  return words.map(word => {
+
+  return words.map((word) => {
     let pauseMultiplier = 1;
-    if (word.endsWith('.') || word.endsWith('!') || word.endsWith('?')) {
+    if (word.endsWith(".") || word.endsWith("!") || word.endsWith("?")) {
+      pauseMultiplier = 2;
+    } else if (word.endsWith(",") || word.endsWith(";") || word.endsWith(":")) {
       pauseMultiplier = 1.5;
-    } else if (word.endsWith(',') || word.endsWith(';') || word.endsWith(':')) {
-      pauseMultiplier = 1.25;
     }
 
     return {
       text: word,
       focalIndex: calculateFocalIndex(word),
-      pauseMultiplier
+      pauseMultiplier,
     };
   });
 };
@@ -42,10 +41,10 @@ export const processText = (text: string): WordData[] => {
 export const splitWord = (word: WordData) => {
   const text = word.text;
   const idx = word.focalIndex;
-  
+
   return {
     prefix: text.substring(0, idx),
-    focal: text[idx] || '',
-    suffix: text.substring(idx + 1)
+    focal: text[idx] || "",
+    suffix: text.substring(idx + 1),
   };
 };
