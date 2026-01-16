@@ -8,6 +8,10 @@ export type AppFontWeight = 'normal' | 'bold';
 
 export interface ReaderSettings {
   wpm: number;
+  initialWpm: number;
+  targetWpm: number;
+  enableGradualIncrease: boolean;
+  wpmJumpStep: number;
   font: AppFont;
   fontWeight: AppFontWeight;
   sideOpacity: number;

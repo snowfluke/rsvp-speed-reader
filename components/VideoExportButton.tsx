@@ -9,9 +9,21 @@ interface VideoExportButtonProps {
   font: AppFont;
   fontWeight: AppFontWeight;
   sideOpacity: number;
+  enableGradualIncrease?: boolean;
+  initialWpm?: number;
+  targetWpm?: number;
 }
 
-const VideoExportButton: React.FC<VideoExportButtonProps> = ({ words, wpm, font, fontWeight, sideOpacity }) => {
+const VideoExportButton: React.FC<VideoExportButtonProps> = ({ 
+  words, 
+  wpm, 
+  font, 
+  fontWeight, 
+  sideOpacity,
+  enableGradualIncrease = false,
+  initialWpm = 300,
+  targetWpm = 600
+}) => {
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -58,14 +70,21 @@ const VideoExportButton: React.FC<VideoExportButtonProps> = ({ words, wpm, font,
 
     recorder.start();
 
-    const interval = 60000 / wpm;
-    const framesPerWord = Math.max(1, Math.round((interval / 1000) * 60));
-    const totalFrames = words.length * framesPerWord;
+    const totalFrames = words.length * Math.max(1, Math.round((60000 / (enableGradualIncrease ? Math.min(initialWpm, targetWpm) : wpm) / 1000) * 60)); // Approximate for estimation
     const frameInterval = 1000 / 60; // 60fps
 
     let currentFrame = 0;
     for (let i = 0; i < words.length; i++) {
         const word = words[i];
+        
+        let currentWordWpm = wpm;
+        if (enableGradualIncrease) {
+            const progressRatio = i / (words.length - 1 || 1);
+            currentWordWpm = initialWpm + (targetWpm - initialWpm) * progressRatio;
+        }
+
+        const interval = 60000 / currentWordWpm;
+        const framesPerWord = Math.max(1, Math.round((interval / 1000) * 60));
         
         for (let frame = 0; frame < framesPerWord; frame++) {
             // Clear canvas

@@ -10,6 +10,10 @@ import { WordData, AppFont, AppFontWeight } from './types';
 const App: React.FC = () => {
   const [text, setText] = useState<string>("Speed reading is a skill that can be developed with practice. Rapid Serial Visual Presentation, or RSVP, is one of the most effective methods to achieve higher reading speeds. By presenting words one by one at a fixed focal point, we eliminate the time lost in eye movements across a page. This app allows you to customize your experience by adjusting the Words Per Minute. Focus on the red character and let the information flow directly into your mind.");
   const [wpm, setWpm] = useState<number>(300);
+  const [initialWpm, setInitialWpm] = useState<number>(300);
+  const [targetWpm, setTargetWpm] = useState<number>(600);
+  const [enableGradualIncrease, setEnableGradualIncrease] = useState<boolean>(false);
+  const [wpmJumpStep, setWpmJumpStep] = useState<number>(50);
   const [font, setFont] = useState<AppFont>('mono');
   const [fontWeight, setFontWeight] = useState<AppFontWeight>('bold');
   const [sideOpacity, setSideOpacity] = useState<number>(0.8);
@@ -68,7 +72,14 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (isPlaying && words.length > 0 && currentIndex < words.length) {
-      const interval = 60000 / wpm;
+      let currentWpm = wpm;
+      
+      if (enableGradualIncrease) {
+        const progressRatio = currentIndex / (words.length - 1 || 1);
+        currentWpm = initialWpm + (targetWpm - initialWpm) * progressRatio;
+      }
+
+      const interval = 60000 / currentWpm;
       timerRef.current = setTimeout(() => {
         setCurrentIndex(prev => {
           if (prev + 1 >= words.length) {
@@ -109,7 +120,16 @@ const App: React.FC = () => {
           <h1 className="text-xl font-bold tracking-tight uppercase">Focus RSVP</h1>
         </div>
         <div className="flex items-center gap-4">
-            <VideoExportButton words={words} wpm={wpm} font={font} fontWeight={fontWeight} sideOpacity={sideOpacity} />
+            <VideoExportButton 
+                words={words} 
+                wpm={wpm} 
+                font={font} 
+                fontWeight={fontWeight} 
+                sideOpacity={sideOpacity} 
+                enableGradualIncrease={enableGradualIncrease}
+                initialWpm={initialWpm}
+                targetWpm={targetWpm}
+            />
             <button 
                 onClick={() => setShowSettings(!showSettings)}
                 className="p-2 hover:bg-zinc-900 rounded-full transition-colors flex items-center gap-2"
@@ -186,7 +206,7 @@ const App: React.FC = () => {
                     type="range" 
                     min="100" 
                     max="1000" 
-                    step="50"
+                    step={wpmJumpStep}
                     value={wpm} 
                     onChange={(e) => setWpm(parseInt(e.target.value))}
                     className="w-full accent-red-600 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
@@ -265,9 +285,12 @@ const App: React.FC = () => {
 
                         {/* Opacity Control */}
                         <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-2 text-zinc-400">
-                                <Layout size={16} />
-                                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em]">Side Opacity</h3>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-zinc-400">
+                                    <Layout size={16} />
+                                    <h3 className="text-[10px] font-bold uppercase tracking-[0.2em]">Side Opacity</h3>
+                                </div>
+                                <span className="text-xs font-mono text-zinc-500">{sideOpacity.toFixed(1)}</span>
                             </div>
                             <input 
                                 type="range" 
@@ -281,6 +304,68 @@ const App: React.FC = () => {
                             <div className="flex justify-between text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
                                 <span>Ghost</span>
                                 <span>Solid</span>
+                            </div>
+                        </div>
+
+                        {/* Gradual Increase Control */}
+                        <div className="lg:col-span-2 flex flex-col gap-4 mt-4 pt-4 border-t border-zinc-900">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-zinc-400">
+                                    <FastForward size={16} />
+                                    <h3 className="text-[10px] font-bold uppercase tracking-[0.2em]">Gradual Speed Control</h3>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        className="sr-only peer" 
+                                        checked={enableGradualIncrease}
+                                        onChange={() => setEnableGradualIncrease(!enableGradualIncrease)}
+                                    />
+                                    <div className="w-9 h-5 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+                                    <span className="ml-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">Enable</span>
+                                </label>
+                            </div>
+
+                            {enableGradualIncrease && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between">
+                                            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-600">Initial: {initialWpm} WPM</span>
+                                        </div>
+                                        <input 
+                                            type="range" min="100" max="1000" step={wpmJumpStep}
+                                            value={initialWpm} onChange={(e) => setInitialWpm(parseInt(e.target.value))}
+                                            className="w-full accent-red-500/50 h-1 bg-zinc-900 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between">
+                                            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-600">Target: {targetWpm} WPM</span>
+                                        </div>
+                                        <input 
+                                            type="range" min="100" max="1000" step={wpmJumpStep}
+                                            value={targetWpm} onChange={(e) => setTargetWpm(parseInt(e.target.value))}
+                                            className="w-full accent-red-600 h-1 bg-zinc-900 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex items-center gap-4 pt-2">
+                                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-600 whitespace-nowrap">WPM Jump Step:</span>
+                                <div className="flex gap-1 flex-1">
+                                    {[10, 25, 50, 100].map(step => (
+                                        <button
+                                            key={step}
+                                            onClick={() => setWpmJumpStep(step)}
+                                            className={`flex-1 py-1 text-[9px] rounded border transition-all uppercase font-bold tracking-widest ${
+                                                wpmJumpStep === step ? 'bg-zinc-200 border-white text-black' : 'bg-black border-zinc-900 text-zinc-600 hover:border-zinc-800'
+                                            }`}
+                                        >
+                                            {step}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
