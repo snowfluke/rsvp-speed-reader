@@ -2,6 +2,7 @@ export interface WordData {
   text: string;
   focalIndex: number;
   pauseMultiplier?: number;
+  lengthMultiplier?: number;
 }
 
 export type AppFont = 'mono' | 'sans' | 'serif';
@@ -13,6 +14,7 @@ export interface ReaderSettings {
   targetWpm: number;
   enableGradualIncrease: boolean;
   wpmJumpStep: number;
+  enableSpeedVariability: boolean;
   font: AppFont;
   fontWeight: AppFontWeight;
   sideOpacity: number;

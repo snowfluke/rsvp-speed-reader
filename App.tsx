@@ -20,11 +20,12 @@ import {
   Type,
   Layout,
   Music,
+  Shuffle,
 } from "lucide-react";
 import RSVPPlayer from "./components/RSVPPlayer";
 import BackgroundMusic from "./components/BackgroundMusic";
 import VideoExportButton from "./components/VideoExportButton";
-import { processText } from "./utils/textProcessor";
+import { processText, calculateVariabilityNormalizer } from "./utils/textProcessor";
 import { WordData, AppFont, AppFontWeight } from "./types";
 
 const App: React.FC = () => {
@@ -37,6 +38,8 @@ const App: React.FC = () => {
   const [enableGradualIncrease, setEnableGradualIncrease] =
     useState<boolean>(false);
   const [wpmJumpStep, setWpmJumpStep] = useState<number>(50);
+  const [enableSpeedVariability, setEnableSpeedVariability] =
+    useState<boolean>(false);
   const [font, setFont] = useState<AppFont>("mono");
   const [fontWeight, setFontWeight] = useState<AppFontWeight>("bold");
   const [sideOpacity, setSideOpacity] = useState<number>(0.8);
@@ -50,6 +53,11 @@ const App: React.FC = () => {
   const [showZenHint, setShowZenHint] = useState<boolean>(false);
 
   const words = useMemo(() => processText(text), [text]);
+
+  const variabilityNormalizer = useMemo(
+    () => calculateVariabilityNormalizer(words, enableSpeedVariability),
+    [words, enableSpeedVariability]
+  );
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -124,7 +132,12 @@ const App: React.FC = () => {
 
       const word = words[currentIndex];
       const pauseMultiplier = word?.pauseMultiplier || 1;
-      const interval = (60000 / currentWpm) * pauseMultiplier;
+      const lengthMultiplier = enableSpeedVariability
+        ? word?.lengthMultiplier || 1
+        : 1;
+      const interval =
+        ((60000 / currentWpm) * pauseMultiplier * lengthMultiplier) /
+        variabilityNormalizer;
 
       timerRef.current = setTimeout(() => {
         setCurrentIndex((prev) => {
@@ -142,7 +155,17 @@ const App: React.FC = () => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [isPlaying, currentIndex, words, wpm]);
+  }, [
+    isPlaying,
+    currentIndex,
+    words,
+    wpm,
+    enableGradualIncrease,
+    initialWpm,
+    targetWpm,
+    enableSpeedVariability,
+    variabilityNormalizer,
+  ]);
 
   const progress =
     words.length > 0 ? ((currentIndex + 1) / words.length) * 100 : 0;
@@ -228,6 +251,7 @@ const App: React.FC = () => {
             enableGradualIncrease={enableGradualIncrease}
             initialWpm={initialWpm}
             targetWpm={targetWpm}
+            enableSpeedVariability={enableSpeedVariability}
           />
           <button
             onClick={() => setShowSettings(!showSettings)}
@@ -558,6 +582,37 @@ const App: React.FC = () => {
                       ))}
                     </div>
                   </div>
+                </div>
+
+                {/* Speed Variability Control */}
+                <div className="lg:col-span-2 flex flex-col gap-3 mt-4 pt-4 border-t border-zinc-900">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-zinc-400">
+                      <Shuffle size={16} />
+                      <h3 className="text-[10px] font-bold uppercase tracking-[0.2em]">
+                        Speed Variability
+                      </h3>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={enableSpeedVariability}
+                        onChange={() =>
+                          setEnableSpeedVariability(!enableSpeedVariability)
+                        }
+                      />
+                      <div className="w-9 h-5 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+                      <span className="ml-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                        Enable
+                      </span>
+                    </label>
+                  </div>
+                  <p className="text-[10px] text-zinc-600 leading-relaxed">
+                    Short words flash faster and long words linger a bit
+                    longer, while the overall pace still averages out to your
+                    selected WPM.
+                  </p>
                 </div>
               </div>
 
